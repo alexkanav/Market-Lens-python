@@ -11,7 +11,11 @@ import numpy as np
 from scipy.signal import argrelextrema, find_peaks
 from sklearn.neighbors import KernelDensity
 from datetime import date
+import logging
 
+
+logging.basicConfig(level=logging.INFO, filename="main.log",filemode="a",
+                    format="%(asctime)s %(levelname)s %(message)s")
 
 CREDENTIALS_FILE = 'trade_key.json'
 spredsheets_id = google_sheet_id
@@ -46,18 +50,16 @@ def download_from_yahoo(stock_name):
             suc = 0
             rez = 0
 
-    except:
+    except Exception as e:
         suc = 0
         rez = 0
+        logging.error("Exception occurred", exc_info=True)
 
     return suc, rez
 
 
-def draw_line_chart(s_n, sample_df, end_range, end_array, lines, r_axis3, date_value3):
+def draw_line_chart(s_n, sample_df, end_range, end_array, r_axis3, date_value3):
     mavg_df = sample_df[['Open', 'High', 'Low', 'Close']].rolling(window=3).mean()
-    plt.plot(sample_df.index, sample_df.Close, color='black')
-    for x in lines:
-        plt.hlines(x, 5, end_range, color='yellow', linewidth=0.5)
 
 
     def trend_angle(frame):
@@ -129,9 +131,11 @@ def draw_line_chart(s_n, sample_df, end_range, end_array, lines, r_axis3, date_v
             dd5 = np.interp(i, xxtrendline, yn_mid2(xxtrendline))
             max_str_max2.append(sample_df.Close.loc[i] - dd5)
 
-        trendline_drawing = plt.plot(xxtrendline, yn_mid2(xxtrendline), color='gold')
-        plt.plot(asd, asd * tilt_angle + intercmin + max(max_str_max2), color=color_line, linewidth=0.5)
-        plt.plot(asd, asd * tilt_angle + intercmin - max(min_str_min), color=color_line, linewidth=0.5)
+        if save_chart == 1:
+            plt.plot(sample_df.index, sample_df.Close, color='black')
+            trendline_drawing = plt.plot(xxtrendline, yn_mid2(xxtrendline), color='gold')
+            plt.plot(asd, asd * tilt_angle + intercmin + max(max_str_max2), color=color_line, linewidth=0.5)
+            plt.plot(asd, asd * tilt_angle + intercmin - max(min_str_min), color=color_line, linewidth=0.5)
 
         max_lev = []
         min_lev = []
@@ -165,11 +169,13 @@ def draw_line_chart(s_n, sample_df, end_range, end_array, lines, r_axis3, date_v
             predicted_points['6m max'] = max_lev[0]
 
     if save_chart == 1:
+        # rotate x-axis tick labels
+        plt.xticks(rotation=45, ha='right', fontsize=8)
+        xticks(r_axis3, date_value3)
+
         plt.savefig(s_n + '.png')
 
-    # rotate x-axis tick labels
-    plt.xticks(rotation=45, ha='right', fontsize=8)
-    xticks(r_axis3, date_value3)
+
 
     print('predicted_points = ', predicted_points)
 
@@ -243,7 +249,7 @@ def main():
             predicted[sn[0]] = ["Insufficient data for analysis",'','','','','','','','','','','']
             continue
 
-        lines = s_r_lines(stock_data)
+        # lines = s_r_lines(stock_data)
         end_array = len(stock_data)
         sample_df = stock_data.iloc[:]
         date = stock_data['Date']
@@ -253,11 +259,12 @@ def main():
         r_axis2 = [x for x in range(0, len(date_value2))]
         r_axis3 = [x for x in range(0, len(r_axis2), 5)]
         date_value3 = [date_value2[i] for i in r_axis3]
-        f = plt.figure()
-        f.suptitle('Line chart - ' + sn[0])
-        f.set_figwidth(15)
-        f.set_figwidth(10)
-        pred = draw_line_chart(sn[0], sample_df, end_range, end_array, lines, r_axis3, date_value3)
+        if save_chart == 1:
+            f = plt.figure()
+            f.suptitle('Line chart - ' + sn[0])
+            f.set_figwidth(15)
+            f.set_figwidth(10)
+        pred = draw_line_chart(sn[0], sample_df, end_range, end_array, r_axis3, date_value3)
         if pred == "prediction is impossible":
             predicted[sn[0]] = ["prediction is impossible",'','','','','','','','','','','']
         else:
