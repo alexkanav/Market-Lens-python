@@ -41,8 +41,14 @@ def download_from_yahoo(stock_name):
 
     try:
         data = yf.download(stock_name, period="1y")
-        data.to_csv(file_name)
-        df = pd.read_csv(file_name)
+
+        df = data.reset_index()
+        df['Date'] = df['Date'].astype(str)
+
+        # data.to_csv(file_name)
+        # df = pd.read_csv(file_name)
+
+
         if len(df) > 125:
             suc = 1
             rez = df
@@ -58,8 +64,49 @@ def download_from_yahoo(stock_name):
     return suc, rez
 
 
-def draw_line_chart(s_n, sample_df, end_range, end_array, r_axis3, date_value3):
+def draw_candle_chart(name, sample_df, end_array, lines):
+    f = plt.figure()
+    f.suptitle('Candle chart - ' + name)
+    f.set_figwidth(15)
+    f.set_figwidth(10)
+
+        # define width of candlestick elements
+    width = .4
+    width2 = .05
+
+        # define up and down prices
+    up = sample_df[sample_df.Close >= sample_df.Open]
+    down = sample_df[sample_df.Close < sample_df.Open]
+
+        # define colors to use
+    col1 = 'green'
+    col2 = 'red'
+
+        # plot up prices
+    plt.bar(up.index, up.Close-up.Open, width, bottom=up.Open, color=col1)
+    plt.bar(up.index, up.High-up.Close, width2, bottom=up.Close, color=col1)
+    plt.bar(up.index, up.Low-up.Open, width2, bottom=up.Open, color=col1)
+
+        # plot down prices
+    plt.bar(down.index, down.Close - down.Open, width, bottom=down.Open, color=col2)
+    plt.bar(down.index, down.High - down.Open, width2, bottom=down.Open, color=col2)
+    plt.bar(down.index, down.Low - down.Close, width2, bottom=down.Close, color=col2)
+
+    # draw support and resistance lines
+    for x in lines:
+        plt.hlines(x, 5, end_array, color='yellow', linewidth=0.5)
+
+    plt.grid(which='major')
+    plt.grid(which='minor', linestyle=':')
+
+
+
+def draw_line_chart(s_n, sample_df, end_range, end_array, lines, r_axis3, date_value3):
     mavg_df = sample_df[['Open', 'High', 'Low', 'Close']].rolling(window=3).mean()
+
+    # draw support and resistance lines
+    for x in lines:
+        plt.hlines(x, 5, end_range, color='yellow', linewidth=0.5)
 
 
     def trend_angle(frame):
@@ -249,7 +296,7 @@ def main():
             predicted[sn[0]] = ["Insufficient data for analysis",'','','','','','','','','','','']
             continue
 
-        # lines = s_r_lines(stock_data)
+        lines = s_r_lines(stock_data)
         end_array = len(stock_data)
         sample_df = stock_data.iloc[:]
         date = stock_data['Date']
@@ -264,7 +311,8 @@ def main():
             f.suptitle('Line chart - ' + sn[0])
             f.set_figwidth(15)
             f.set_figwidth(10)
-        pred = draw_line_chart(sn[0], sample_df, end_range, end_array, r_axis3, date_value3)
+        pred = draw_line_chart(sn[0], sample_df, end_range, end_array, lines, r_axis3, date_value3)
+        draw_candle_chart(sn[0], sample_df, end_array, lines)
         if pred == "prediction is impossible":
             predicted[sn[0]] = ["prediction is impossible",'','','','','','','','','','','']
         else:
@@ -277,4 +325,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# plt.show()
+plt.show()
