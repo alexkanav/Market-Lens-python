@@ -3,21 +3,6 @@ from matplotlib import pyplot as plt
 from config import INDICES
 
 
-def draw_turning_points(name: str, close_df, extrema_prices):
-    """
-    Plots trend reversal (turning) points on a horizontal line.
-    This is helpful in time series analysis for identifying critical moments in price movements.
-    """
-    plt.figure('Turning points', facecolor='lightgray')
-    plt.suptitle(f'Trend reversal points - {name}')
-    plt.xlabel("Price")
-    plt.hlines(1, min(close_df), max(close_df))
-    plt.eventplot(extrema_prices, orientation='horizontal', colors='b')
-
-    ax = plt.gca()  # get the current axes
-    ax.set_facecolor("beige")
-
-
 def draw_candle_chart(name: str, df, lines, up_color: str, down_color: str, date_axis: tuple[list[int], list[str]], region=None):
     """
     Draws a candlestick chart with optional highlight regions and additional support and resistance lines.
@@ -88,3 +73,18 @@ def draw_line_chart(name, df, close_df, lines_coords: list, date_axis, linestyle
     # Set x-ticks with rotation and alignment
     plt.xticks(*date_axis, rotation=45, ha='right', fontsize=8)
     plt.tight_layout(pad=2.0)
+
+
+def draw_turning_points(name: str, close_df, extrema_prices):
+    """
+    Plots trend reversal (turning) points on a horizontal line.
+    This is helpful in time series analysis for identifying critical moments in price movements.
+    """
+    plt.figure('Turning points', facecolor='lightgray')
+    plt.suptitle(f'Trend reversal points - {name}')
+    plt.xlabel("Price")
+    plt.hlines(1, min(close_df), max(close_df))
+    plt.eventplot(extrema_prices, orientation='horizontal', colors='b')
+
+    ax = plt.gca()  # get the current axes
+    ax.set_facecolor("beige")
