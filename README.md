@@ -1,38 +1,40 @@
-# Stock Technical Analysis from Google Sheets
+# Stock Technical Analysis
 
-This project reads a list of stock tickers from a Google Sheet, downloads price data from Yahoo Finance, estimates support and resistance levels using Kernel Density Estimation (KDE), computes trend-based price predictions, and generates detailed visualizations including candlestick charts and trend lines. Writes prediction results back to Google Sheets.
-
+A fully automated stock-analysis pipeline that reads tickers from Google Sheets, downloads historical market data from Yahoo Finance, computes technical indicators such as support and resistance levels using Kernel Density Estimation (KDE), performs trend-based price forecasting, and generates rich visualizations. Final predictions and key metrics are automatically written back to Google Sheets.
 ---
 
 ## Features
-1. Google Sheets Integration
-Automatically loads a list of stock tickers from a Google Sheet.
+### Google Sheets Integration
+- Automatically imports a list of stock tickers using the Google Sheets API.
+- Writes prediction results (trend, forecast levels, support/resistance zones) back to the sheet.
 
-2. Data Collection from Yahoo Finance
-Fetches historical OHLC (Open, High, Low, Close) data using the yfinance API.
+### Market Data Collection
+- Fetches historical OHLC data from Yahoo Finance using the yfinance API.
+- Supports custom timeframes and intervals.
 
-3. Support & Resistance Levels
-Uses Kernel Density Estimation on local extrema to detect key levels.
+### Support & Resistance Detection
+- Applies Kernel Density Estimation to highlight high-probability support/resistance clusters.
+- Produces clean, interpretable levels.
 
-4. Trend Line Forecasting
-Computes upward/downward trends and predicts future price ranges.
+### Trend Line Forecasting
+- Identifies upward/downward trend channels.
+- Fits regression-based trend lines.
+- Projects forward price ranges and potential breakout points.
 
-5. Visualizations -- Generates:
+### High-Quality Visualizations
+Automatically generates annotated charts including:
 
    - Candlestick charts
 
-   - Support & resistance levels
-
    - Trend line extrapolations
 
-   - Annotated turning points
+   - Detected turning points
+
+   - KDE-based support & resistance zones
+
+These visuals are saved locally for analysis or reporting.
 
 ---
-## Results Export
-Writes prediction results back to Google Sheets.
-
----
-
 ## Screenshots
 
 ![screenshot_1](https://github.com/user-attachments/assets/d96df5eb-7247-4432-a05f-963bef6cf2e5)
